@@ -14,6 +14,8 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import android.location.Address;
@@ -28,7 +30,7 @@ import java.util.List;
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     //Variable para el maneo del mapa
-    private GoogleMap mMap;
+    private GoogleMap mapa;
 
     //Variable manejo base de datos
     private SQLiteDatabase db;
@@ -99,12 +101,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //GPSTask.execute();
 
 
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+        //Obtenemos el SupportMapFragment y notificamos cuando esté preparado para usar
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
         GoogleMap mapa = ((SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map)).getMap();
+
+        //Colocamos la vista del mapa en tipo Satélite
         mapa.setMapType(GoogleMap.MAP_TYPE_HYBRID);
 
     }
@@ -121,14 +125,31 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
      */
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        mMap = googleMap;
 
-        // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(-34, 151);
-        LatLng madrid = new LatLng(40, 3);
+        //Obtenemos la referencia del mapa
+        mapa = googleMap;
 
-        mMap.addMarker(new MarkerOptions().position(madrid).title("Marker in Madrid"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(madrid));
+        //Creamos las coordenadas de Madrid para centrar el mapa en Madrid
+        LatLng madrid = new LatLng(40.417325, -3.683081);
+
+        //Añadimos un marcador en Madrid
+        mapa.addMarker(new MarkerOptions().position(madrid).title("Madrid"));
+
+        CameraPosition camPos = new CameraPosition.Builder()
+                .target(madrid)
+                .zoom (10)
+                .bearing(0)
+                .tilt(0)
+                .build();
+
+        CameraUpdate camUpd = CameraUpdateFactory.newCameraPosition(camPos);
+
+        mapa.animateCamera(camUpd);
+        //mapa.setMyLocationEnabled(true);
+        //mapa.moveCamera(CameraUpdateFactory.newLatLng(madrid));
+
+
+
     }
 
     private class LeerDatosXmlTask extends AsyncTask<Void, Integer, Boolean> {
